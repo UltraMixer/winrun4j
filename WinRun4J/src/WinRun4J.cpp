@@ -34,6 +34,12 @@ extern "C" {
 	_declspec(dllexport) DWORD NvOptimusEnablement = 0x00000001;
 }
 
+//ATI please also give us the high performance GPU when possible
+extern "C"
+{
+	__declspec(dllexport) int AmdPowerXpressRequestHighPerformance = 1;
+}
+
 namespace 
 {
 	TCHAR *vmargs[MAX_PATH];
