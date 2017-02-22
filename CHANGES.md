@@ -5,6 +5,7 @@
 * native library path fixup
 * fallback to the default VM location when it is not found
 * NVidia Optimization enabled when possible, this is the default behaviour of javaw.exe
+* ATI high performance GPU enabled when possible, this is the default behaviour of javaw.exe
 * ini enhancment %MODULE_DIR% added
 * ini enhancment  %MODULE_NAME% added
 * self contained jni headers
