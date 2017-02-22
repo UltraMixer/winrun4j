@@ -10,6 +10,8 @@ iniparser is distributed under an MIT license.
 
 #include "Dictionary.h"
 
+
+
 #define strlen lstrlen
 
 #define MAXVALSZ	1024
@@ -488,7 +490,86 @@ void parse_line(char * sec, char * lin, dictionary * d)
     }
 }
 
-dictionary * iniparser_load(char * ininame, bool isbuffer)
+
+void strReplace(char* pattern,char* replacement,char* buffer,int maxLength) 
+{
+      int buflen = strlen(buffer);  // atual string length (changes after each replace)
+      int patlen = strlen(pattern);  // pattern length, constant
+      int replen = strlen(replacement);  // replacement lengh, constant
+      int matlen = (patlen < replen ? patlen : replen);  // length of pattern/replacement mathcing part
+      int ptr = 0;  // pointer, runs from 0 to buffer length
+
+      while (true) {
+
+        // find out, if string at buffer[ptr] matches the pattern
+        int match = true;
+        for (int n = 0; n < patlen; n++) {
+          if ((n + ptr) == buflen) return;
+          if (buffer[n + ptr] != pattern[n]) {
+            match = false;
+            break;
+          } // if matching
+        } // for pattern
+
+        // if not match, increase ptr
+        if (!match) {
+          ptr++;
+          if (ptr > buflen) return;
+          continue;
+        } // if not match
+
+        // replace the common part (which requires no remaining block move)
+        for (int n = 0; n < matlen; n++) buffer[n + ptr] = replacement[n];
+        // if we're lucky, the search string is same lenght as replacement
+        if (patlen == replen) return;
+
+        // move remaining
+        if (patlen > replen) {  // shrink, if repacement was shorter
+
+          int shrink = patlen - replen;
+          // perform shrink
+          for (int idx = matlen + ptr; idx < buflen - shrink; idx++) {
+            buffer[idx] = buffer[shrink + idx];
+          }
+          // don't forget to close the asciiz string
+          buffer[buflen - shrink] = 0;
+
+          // align ptr
+          ptr = 1 + ptr - shrink;
+          // align buffer
+          buflen -= shrink;
+
+        } else {   // expan if replacement is longer
+
+          int expand = replen - patlen;
+          int bufend = buflen + expand;  // buffer end after expand
+          if (bufend > maxLength - 1) bufend = maxLength - 1;  // apply maxLength
+
+          // make room by copying remaining to the end of the string
+          for (int idx = bufend; idx > ptr + matlen + expand; idx--) {
+            buffer[idx - 1] = buffer[idx - 1 - expand];
+          }
+          // fill the hole with the remainig part of the replacement
+          for (int n = matlen; n < replen; n++) {
+            buffer[n + ptr] = replacement[n];
+          }
+          // don't forget to close the asciiz string
+          buffer[bufend] = 0;
+
+          // align ptr
+          ptr = 1 + ptr + expand;
+          // align buffer
+          buflen = bufend;
+
+        } // if shrink else expand
+
+        // continue from new ptr
+
+      } // scan buffer
+
+    } // strReplace()
+
+dictionary * iniparser_load(char * ininame, bool isbuffer, HINSTANCE hInstance)
 {
     dictionary  *   d ;
     char        sec[ASCIILINESZ+1];
@@ -506,6 +587,15 @@ dictionary * iniparser_load(char * ininame, bool isbuffer)
 		return NULL ;
 	}
 
+	TCHAR filename[MAX_PATH];
+	TCHAR filedir[MAX_PATH];
+	if( hInstance!=NULL )
+	{
+		GetModuleFileName(hInstance, filename, MAX_PATH);
+		// strip off filename to get module directory
+		GetFileDirectory(filename, filedir);
+	}
+
     /*
      * Initialize a new dictionary entry
      */
@@ -514,6 +604,12 @@ dictionary * iniparser_load(char * ininame, bool isbuffer)
 	int pos = 0;
 	while ((isbuffer ? sgets(ininame, &pos, lin, ASCIILINESZ) : fgets(lin, ASCIILINESZ, ini)) != NULL) {
 		lineno++;
+		if( hInstance!=NULL )
+		{
+			strReplace("%MODULE_DIR%", filedir, lin, ASCIILINESZ+1);
+			strReplace("%MODULE_NAME%", filename, lin, ASCIILINESZ+1);
+			//::MessageBox(NULL, lin, lin, MB_OK);
+		}
 		parse_line(sec, lin, d);
 		memset(lin, 0, ASCIILINESZ);
     }

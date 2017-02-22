@@ -121,7 +121,8 @@ char* VM::FindJavaVMLibrary(dictionary *ini)
 			SetCurrentDirectory(defWorkingDir);
 		}
 		
-		return NULL;
+		//return NULL;
+		return vmDefaultLocation; // returing always the default location if it is not suitable
 	}
 
 	return vmDefaultLocation;
@@ -373,11 +374,18 @@ void VM::ExtractSpecificVMArgs(dictionary* ini, TCHAR** args, UINT& count)
 	if(libPathsCount > 0) {
 		TCHAR libPathArg[4096];
 		libPathArg[0] = 0;
+		TCHAR pathArg[4096];
+        pathArg[0] = 0;
 		strcat(libPathArg, "-Djava.library.path=");
 		for(int i =0 ; i < libPathsCount; i++) {
 			strcat(libPathArg, libPaths[i]);
 			strcat(libPathArg, ";");
+			strcat(pathArg, libPaths[i]);
+            strcat(pathArg, ";");
 		}
+		strcat(pathArg, getenv("PATH"));
+        SetEnvironmentVariable("PATH", strdup(pathArg));
+		//::MessageBox(NULL, pathArg, pathArg, MB_OK);
 		args[count++] = strdup(libPathArg);
 	}
 }

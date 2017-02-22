@@ -96,7 +96,7 @@ dictionary* INI::LoadIniFile(HINSTANCE hInstance, LPSTR inifile)
 		PBYTE pb = (PBYTE) LockResource(hg);
 		DWORD* pd = (DWORD*) pb;
 		if(pd && *pd == INI_RES_MAGIC) {
-			ini = iniparser_load((char *) &pb[RES_MAGIC_SIZE], true);	
+			ini = iniparser_load((char *) &pb[RES_MAGIC_SIZE], true, hInstance);	
 			if(!ini) {
 				Log::Warning("Could not load embedded INI file");
 			}
@@ -106,7 +106,7 @@ dictionary* INI::LoadIniFile(HINSTANCE hInstance, LPSTR inifile)
 	// Check if we have already loaded an embedded INI file - if so 
 	// then we only need to load and merge the INI file (if present)
 	if(ini && iniparser_getboolean(ini, ALLOW_INI_OVERRIDE, 1)) {
-		dictionary* ini2 = iniparser_load(inifile);
+		dictionary* ini2 = iniparser_load(inifile, false, hInstance);
 		if(ini2) {
 			for(int i = 0; i < ini2->n; i++) {
 				char* key = ini2->key[i];
@@ -116,7 +116,7 @@ dictionary* INI::LoadIniFile(HINSTANCE hInstance, LPSTR inifile)
 			iniparser_freedict(ini2);
 		}
 	} else if(!ini) {
-		ini = iniparser_load(inifile);
+		ini = iniparser_load(inifile, false, hInstance);
 		if(ini == NULL) {
 			Log::Error("Could not load INI file: %s", inifile);
 			return NULL;
@@ -133,7 +133,7 @@ dictionary* INI::LoadIniFile(HINSTANCE hInstance, LPSTR inifile)
 	char* iniFileLocation = iniparser_getstr(ini, INI_FILE_LOCATION);
 	if(iniFileLocation) {
 		Log::Info("Loading INI keys from file location: %s", iniFileLocation);
-		dictionary* ini3 = iniparser_load(iniFileLocation);
+		dictionary* ini3 = iniparser_load(iniFileLocation, false, hInstance);
 		if(ini3) {
 			ExpandVariables(ini3);
 			for(int i = 0; i < ini3->n; i++) {

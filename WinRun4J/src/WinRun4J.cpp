@@ -28,6 +28,12 @@
 #define ERROR_MESSAGES_JAVA_START_FAILED    "ErrorMessages:java.failed"
 #define ERROR_MESSAGES_MAIN_CLASS_NOT_FOUND "ErrorMessages:main.class.not.found"
 
+
+//Please oh mighty Optimus, give us the High Performance GPU by default
+extern "C" { 
+	_declspec(dllexport) DWORD NvOptimusEnablement = 0x00000001;
+}
+
 namespace 
 {
 	TCHAR *vmargs[MAX_PATH];
