@@ -1,5 +1,15 @@
 ## Change History
 
+### 0.4.6 (working state)
+* OneXip restart active development for Winrun4J
+* native library path fixup
+* fallback to the default VM location when it is not found
+* NVidia Optimization enabled when possible, this is the default behaviour of javaw.exe
+* ini enhancment %MODULE_DIR% added
+* ini enhancment  %MODULE_NAME% added
+* self contained jni headers
+* using visual studio 2008 now
+
 ### 0.4.5
 
 * Allow vmargs and INI overrides on the commandline (-D, -X, -W)

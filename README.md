@@ -262,6 +262,20 @@ given the physical memory available.</td>
 
 <b>Note: </b>INI values can contain environment variables, which will be substituted on startup, eg <code>log.file=%TEMP%/mylog.txt</code>
 
+<b>Aditional INI file macros:</b>
+<table>
+	<tr><th>Key</th><th>Description</th></tr>
+	<tr>
+		<td>%MODULE_DIR%</td>
+		<td>module diretcory to be passed to the java application</td>
+	</tr>
+	<tr>
+		<td>%MODULE_NAME%</td>
+		<td>module name to be passed to the java application</td>
+	</tr>
+</table>
+
+
 ## Command Line Arguments
 
 The launcher supports overriding INI keys and VM args on the command line. The default setup is per the following example:
@@ -336,3 +350,7 @@ Note:
 * The embedded INI entries are overwridden by an external INI file (if present).
 * Any JARs added to the executable will automatically be added to the classpath (before all classpath entries specified in the INI file and in the order in which they are embedded). They don't need to be specified in the INI file.
 * If an embedded splash image is present it will automatically appear (it doesn't need to be specified in the INI file).
+
+## Professional support
+
+If you need professional support for Winrun4J, please contact us at: http://www.onexip.com/kontakt/
